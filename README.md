@@ -21,9 +21,9 @@ Stellar is a high-performance video conferencing application built on [Livekit](
 - **Prisma**
 
 ## Live Demo
-- **Live Site**: [stellar-v2.vercel.app](https://stellar-v2.vercel.app/)
+- **Live Site**: [stellar-conferencing.vercel.app](https://stellar-conferencing.vercel.app/)
 - **Storybook**: [Chromatic Deployment](https://67b50579a9acefa8d24d742c-flhpwdivqz.chromatic.com/)
-- **Swagger API Docs**: [stellar-v2-server.onrender.com/api](https://stellar-v2-server.onrender.com/api)
+- **Swagger API Docs**: [stellar-v2-server.onrender.com/api](https://stellar-conferencing.onrender.com/api)
 
 ## Repository
 - **GitHub**: [ore-codes/stellar-conferencing](https://github.com/ore-codes/stellar-conferencing)
