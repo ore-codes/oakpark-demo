@@ -42,7 +42,7 @@ const App: FC = () => {
             <Route index element={<OnboardingRoute element={<SignIn />} />} />
             <Route path={Page.SignUp} element={<SignUp />} />
             <Route path={Page.Dashboard} element={<ProtectedRoute element={<Dashboard />} />} />
-            <Route path="/meeting/:code" element={<ProtectedRoute element={<Meeting />} />} />
+            <Route path={Page.Meeting(':code')} element={<ProtectedRoute element={<Meeting />} />} />
           </Routes>
         </Router>
       </SnackbarProvider>

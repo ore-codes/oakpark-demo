@@ -44,4 +44,6 @@ const Modal = forwardRef<ModalRef, PropsWithChildren>((props, ref) => {
   );
 });
 
+Modal.displayName = 'Modal';
+
 export default Modal;
