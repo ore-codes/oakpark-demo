@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -42,8 +41,8 @@ export class AuthService {
     return this.jwtService.sign({ sub: userId, email });
   }
 
-  private excludePassword({ ...user }: User) {
-    delete user.password;
-    return user;
+  private excludePassword(user: any) {
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 }
