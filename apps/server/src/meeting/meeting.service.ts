@@ -136,6 +136,28 @@ export class MeetingService {
     }
   }
 
+  async getCreatedMeetings(userId: string) {
+    return this.prisma.meeting.findMany({
+      where: { userId },
+      include: {
+        participants: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
   private async generateUniqueCode(): Promise<string> {
     let uniqueCode: string;
     let collision = true;

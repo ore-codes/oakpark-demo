@@ -14,6 +14,7 @@ import Dashboard from '@/pages/Dashboard/Dashboard.tsx';
 import Meeting from '@/pages/Meeting/Meeting.tsx';
 import SignIn from '@/pages/SignIn.tsx';
 import SignUp from '@/pages/SignUp.tsx';
+import MeetingHistory from '@/pages/MeetingHistory/MeetingHistory.tsx';
 
 const App: FC = () => {
   const isAuthenticated = useRxState(authService.isAuthenticated$);
@@ -43,6 +44,7 @@ const App: FC = () => {
             <Route path={Page.SignUp} element={<SignUp />} />
             <Route path={Page.Dashboard} element={<ProtectedRoute element={<Dashboard />} />} />
             <Route path={Page.Meeting(':code')} element={<ProtectedRoute element={<Meeting />} />} />
+            <Route path={Page.MeetingHistory} element={<ProtectedRoute element={<MeetingHistory />} />} />
           </Routes>
         </Router>
       </SnackbarProvider>

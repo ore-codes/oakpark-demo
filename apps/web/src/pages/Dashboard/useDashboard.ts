@@ -29,12 +29,19 @@ export default function useDashboard() {
       clickHandler: () => createModalRef.current.present(),
     },
     {
-      icon: 'ic:baseline-group',
+      icon: 'ic:baseline-group', 
       title: 'Join meeting',
       clickHandler: () => joinModalRef.current.present(),
     },
-    { icon: 'mdi:calendar-edit', title: 'Schedule meeting' },
-    { icon: 'mdi:history', title: 'Meeting history' },
+    { 
+      icon: 'mdi:calendar-edit',
+      title: 'Schedule meeting'
+    },
+    {
+      icon: 'mdi:history',
+      title: 'Meeting history',
+      clickHandler: () => navigate(Page.MeetingHistory)
+    },
   ];
 
   return { user, handleLogout, actions, itemVariants, createModalRef, joinModalRef };

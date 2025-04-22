@@ -21,6 +21,14 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 export class MeetingController {
   constructor(private readonly meetingService: MeetingService) {}
 
+  @Get('created')
+  @ApiResponse({ status: 200, description: 'Meetings retrieved successfully.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  getCreatedMeetings(@Req() req: any) {
+    const userId = req.user.userId;
+    return this.meetingService.getCreatedMeetings(userId);
+  }
+
   @Get(':code')
   @ApiResponse({ status: 200, description: 'Meeting retrieved successfully.' })
   @ApiResponse({ status: 404, description: 'Meeting not found.' })

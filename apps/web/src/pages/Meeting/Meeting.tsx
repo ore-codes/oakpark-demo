@@ -72,7 +72,7 @@ function Meeting() {
       ).subscribe({
         next: (res) => {
           if (res) {
-            enqueueSnackbar('Document submitted successfully! You may now log out.', {
+            enqueueSnackbar('Document submitted successfully! You may leave the meeting now.', {
               variant: 'success',
               autoHideDuration: 5000,
             });
