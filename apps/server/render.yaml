@@ -3,7 +3,7 @@ services:
     name: your-app
     env: node
     buildCommand: npm install && npx prisma generate && nest build
-    startCommand: sh -c "npx prisma migrate deploy && npm run start:prod"
+    startCommand: sh -c "mkdir -p /var/data/db && npx prisma migrate deploy && node dist/main"
     disk:
       name: data
       mountPath: /var/data
