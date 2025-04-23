@@ -3,7 +3,7 @@ services:
     name: your-app
     env: node
     buildCommand: npm install && npx prisma generate && nest build
-    startCommand: sh -c "touch /var/data/prod.db && npx prisma migrate deploy && node dist/main"
+    startCommand: sh -c "mkdir -p /var/data/sqlite && touch /var/data/sqlite/prod.db && npx prisma migrate deploy && node dist/main"
     disk:
       name: data
       mountPath: /var/data
