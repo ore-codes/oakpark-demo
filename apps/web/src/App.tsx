@@ -40,8 +40,9 @@ const App: FC = () => {
       <SnackbarProvider anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}>
         <Router>
           <Routes>
-            <Route index element={<OnboardingRoute element={<SignIn />} />} />
+            <Route index element={<OnboardingRoute element={<SignUp />} />} />
             <Route path={Page.SignUp} element={<SignUp />} />
+            <Route path={Page.SignIn} element={<SignIn />} />
             <Route path={Page.Dashboard} element={<ProtectedRoute element={<Dashboard />} />} />
             <Route path={Page.Meeting(':code')} element={<ProtectedRoute element={<Meeting />} />} />
             <Route path={Page.MeetingHistory} element={<ProtectedRoute element={<MeetingHistory />} />} />

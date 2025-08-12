@@ -11,10 +11,10 @@ const ActionButton: FC<ActionButtonProps> = (props) => {
   return (
     <button
       onClick={props.onClick}
-      className="flex size-24 flex-col items-center gap-2 rounded-2xl border bg-white p-4 text-primary shadow-lg transition-all hover:shadow-md hover:brightness-95 lg:size-32 lg:px-6"
+      className="flex items-center gap-2 rounded-lg bg-primary p-4 text-white shadow-lg transition-all hover:shadow-md hover:brightness-95"
     >
-      <Icon icon={props.icon} className="size-12 lg:size-16" />
-      <span className="text-center text-xs font-semibold lg:text-sm">{props.title}</span>
+      <Icon icon={props.icon} className="size-5" />
+      <span className="text-center text-base font-semibold text-white">{props.title}</span>
     </button>
   );
 };

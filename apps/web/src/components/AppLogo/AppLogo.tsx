@@ -11,7 +11,7 @@ const AppLogo: FC<Pick<ComponentProps<'div'>, 'className'>> = (props) => {
       )}
     >
       <Icon icon="fluent:video-recording-20-filled" />
-      <div className="font-bold tracking-tighter">STELLAR</div>
+      <div className="font-bold tracking-tighter">Oak-Park</div>
     </div>
   );
 };

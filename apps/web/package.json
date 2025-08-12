@@ -13,6 +13,7 @@
     "chromatic": "npx chromatic --project-token=chpt_7272934ca6ebfa5"
   },
   "dependencies": {
+    "@excalidraw/excalidraw": "^0.18.0",
     "@fontsource-variable/inter": "^5.0.18",
     "@hookform/resolvers": "^3.9.0",
     "@livekit/components-react": "^2.8.1",

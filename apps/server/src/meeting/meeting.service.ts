@@ -9,7 +9,7 @@ export class MeetingService {
   constructor(
     private prisma: PrismaService,
     private config: ConfigService,
-  ) {}
+  ) { }
 
   async getMeetingByCode(code: string) {
     const meeting = await this.prisma.meeting.findUnique({
@@ -136,9 +136,15 @@ export class MeetingService {
     }
   }
 
-  async getCreatedMeetings(userId: string) {
+  async getUserMeetings(userId: string) {
     return this.prisma.meeting.findMany({
-      where: { userId },
+      where: {
+        participants: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
       include: {
         participants: {
           include: {
@@ -154,6 +160,48 @@ export class MeetingService {
       },
       orderBy: {
         createdAt: 'desc',
+      },
+    });
+  }
+
+  async getOngoingMeetings(userId: string) {
+    return this.prisma.meeting.findMany({
+      where: {
+        AND: [
+          {
+            participants: {
+              some: {
+                userId: userId,
+              },
+            },
+          },
+          {
+            participants: {
+              some: {
+                isActive: true,
+              },
+            },
+          },
+        ],
+      },
+      include: {
+        participants: {
+          where: {
+            isActive: true,
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        startTime: 'desc',
       },
     });
   }

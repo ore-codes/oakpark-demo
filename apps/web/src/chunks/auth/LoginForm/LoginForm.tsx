@@ -15,7 +15,6 @@ const LoginForm: FC = () => {
       className="border-border flex flex-col gap-8 rounded-xl px-11 py-9 lg:border"
     >
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold">Sign in</h1>
         <h2 className="text-dark">Welcome. Enter your credentials to log in to your account.</h2>
       </div>
       <div className="flex flex-col gap-4">

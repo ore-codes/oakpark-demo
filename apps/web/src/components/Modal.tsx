@@ -31,7 +31,7 @@ const Modal = forwardRef<ModalRef, PropsWithChildren>((props, ref) => {
           visible: { opacity: 1, scale: 1 },
         }}
         onClick={(e) => e.stopPropagation()}
-        className="relative min-w-96 rounded-xl bg-white p-8 shadow-lg"
+        className="relative min-w-96 rounded-xl bg-white p-8 shadow-lg w-5/6 max-w-4xl"
       >
         <Icon
           icon="mi:close"

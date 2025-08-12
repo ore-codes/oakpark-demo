@@ -12,7 +12,6 @@ const RegisterForm: FC = () => {
   return (
     <form onSubmit={h.handleSubmit} className="flex flex-col gap-8 rounded-xl px-11 py-9 lg:border">
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold">Sign up</h1>
         <h2 className="text-dark">
           Register an account and get access to all the platform's features for free.
         </h2>

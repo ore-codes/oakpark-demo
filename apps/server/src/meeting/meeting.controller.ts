@@ -19,14 +19,22 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 @UseGuards(JwtAuthGuard)
 @Controller('meetings')
 export class MeetingController {
-  constructor(private readonly meetingService: MeetingService) {}
+  constructor(private readonly meetingService: MeetingService) { }
 
-  @Get('created')
+  @Get('meetings')
   @ApiResponse({ status: 200, description: 'Meetings retrieved successfully.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  getCreatedMeetings(@Req() req: any) {
+  getUserMeetings(@Req() req: any) {
     const userId = req.user.userId;
-    return this.meetingService.getCreatedMeetings(userId);
+    return this.meetingService.getUserMeetings(userId);
+  }
+
+  @Get('ongoing')
+  @ApiResponse({ status: 200, description: 'Ongoing meetings retrieved successfully.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  getOngoingMeetings(@Req() req: any) {
+    const userId = req.user.userId;
+    return this.meetingService.getOngoingMeetings(userId);
   }
 
   @Get(':code')
