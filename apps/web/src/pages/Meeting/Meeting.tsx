@@ -1,42 +1,42 @@
 import '@livekit/components-styles';
-
-import {
-  ControlBar, GridLayout, LiveKitRoom, ParticipantTile, RoomAudioRenderer, useTracks
-} from '@livekit/components-react';
-import { Room, Track } from 'livekit-client';
+import { LiveKitRoom } from '@livekit/components-react';
+import { Room } from 'livekit-client';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-
 import AppLogo from '@/components/AppLogo/AppLogo.tsx';
 import { Page } from '@/constants/pages.ts';
 import { apiClient } from '@/lib/api/axios.ts';
 import { useApiRequest } from '@/lib/api/useApiRequest.ts';
 import { Env } from '@/lib/config.ts';
-
 import { JoinMeetingRes } from './Meeting.types.ts';
 import { Icon } from '@iconify/react';
+import { VideoConference } from '@/chunks/meeting/VideoConference/VideoConference.tsx';
+import { formatMeetingCode } from '@/lib/utils.ts';
 
 function Meeting() {
   const { code } = useParams<{ code: string }>();
   const [meeting, setMeeting] = useState<JoinMeetingRes['meeting']>();
   const [token, setToken] = useState<string>();
-  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const room = useMemo(() => new Room(), []);
   const joinApiRequest = useApiRequest<JoinMeetingRes>();
   const navigate = useNavigate();
 
-  const toggleHeader = () => {
-    setIsHeaderVisible(!isHeaderVisible);
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
   };
 
   const formatTime = (seconds: number): string => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-
     if (hours > 0) {
       return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
@@ -48,9 +48,7 @@ function Meeting() {
       if (res) {
         setToken(res.token);
         setMeeting(res.meeting);
-
         setElapsedTime(res.participant.durationInSecs || 0);
-
         intervalRef.current = setInterval(() => {
           setElapsedTime(prev => prev + 1);
         }, 1000);
@@ -78,58 +76,139 @@ function Meeting() {
   if (!meeting) return null;
 
   return (
-    <div className="relative" onClick={toggleHeader}>
+    <div className="relative h-screen overflow-hidden">
+      {/* Sidebar Toggle Button - Fixed position for easy access */}
+      <button
+        onClick={toggleSidebar}
+        className="fixed top-4 left-4 z-50 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-lg p-2 shadow-lg hover:bg-white transition-all duration-200 md:hidden"
+        aria-label="Toggle sidebar"
+      >
+        <Icon icon="solar:sidebar-minimalistic-outline" className="size-5 text-gray-700" />
+      </button>
+
+      {/* Mobile Overlay */}
       <AnimatePresence>
-        {isHeaderVisible && (
+        {isSidebarOpen && (
           <motion.div
-            className="z-50 absolute top-0 left-0 w-full flex justify-between items-center gap-2 rounded-xl bg-light/90 px-4 py-4"
-            initial={{ y: -100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -100, opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeSidebar}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar */}
+      <AnimatePresence>
+        {(isSidebarOpen || window.innerWidth >= 768) && (
+          <motion.div
+            className="fixed left-0 top-0 h-full bg-white/95 backdrop-blur-sm border-r border-gray-200 shadow-lg z-40 flex flex-col"
+            style={{ width: '320px' }}
+            initial={{ x: -320, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -320, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
-            <AppLogo className="!text-base !text-primary" />
-            <h1 className="text-xl font-semibold text-secondary">{meeting.title}</h1>
-            <div className="inline-flex items-center gap-1 sm:gap-2 bg-primary/50 text-xs sm:text-sm font-inter-700 text-gray-700 rounded-xl px-2 font-bold sm:px-5 py-1 sm:py-3">
-              <Icon icon="solar:clock-circle-outline" className="size-5" />
-              {formatTime(elapsedTime)}
+            {/* Sidebar Header */}
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <AppLogo className="!text-lg !text-primary" />
+                <button
+                  onClick={closeSidebar}
+                  className="p-1 rounded-lg hover:bg-gray-100 transition-colors md:hidden"
+                  aria-label="Close sidebar"
+                >
+                  <Icon icon="solar:close-circle-outline" className="size-5 text-gray-500" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <h1 className="text-xl font-semibold text-secondary line-clamp-2">{meeting.title}</h1>
+
+                {/* Timer */}
+                <div className="inline-flex items-center gap-2 bg-primary/10 text-sm font-semibold text-gray-700 rounded-lg px-3 py-2">
+                  <Icon icon="solar:clock-circle-outline" className="size-5" />
+                  <span>{formatTime(elapsedTime)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Sidebar Content */}
+            <div className="flex-1 p-6 overflow-y-auto">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium text-gray-900">Meeting Info</h3>
+                  <div className="text-sm text-gray-600">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon icon="solar:calendar-outline" className="size-4" />
+                      <span>Code: {formatMeetingCode(meeting.code)}</span>
+                    </div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span>{meeting.description}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Participants Section */}
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium text-gray-900">Participants</h3>
+                  <div className="text-sm text-gray-600">
+                    {meeting.participants && meeting.participants.length > 0 ? (
+                      <div className="space-y-2">
+                        {meeting.participants.map((participant) => (
+                          <div key={participant.id} className="flex items-center gap-2 p-2 rounded-lg bg-gray-50">
+                            <Icon
+                              icon="solar:user-outline"
+                              className={`size-4 ${participant.isActive ? 'text-green-500' : 'text-gray-400'}`}
+                            />
+                            <span className="font-medium">{participant.user.username}</span>
+                            {participant.isActive && (
+                              <span className="ml-auto text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                                Active
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-gray-500">
+                        <Icon icon="solar:users-group-rounded-outline" className="size-4" />
+                        <span>No participants yet</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-      <LiveKitRoom
-        connect={Boolean(token && room)}
-        room={room}
-        video={true}
-        audio={true}
-        token={token}
-        serverUrl={Env.LiveKitUrl}
-        data-lk-theme="default"
-        style={{ height: '100vh' }}
-        onDisconnected={leaveRoom}
-        onError={leaveRoom}
+
+      {/* Main Content */}
+      <div
+        className="h-full transition-all duration-300"
+        style={{
+          paddingLeft: !isSidebarOpen && window.innerWidth < 768 ? '0px' : '320px'
+        }}
       >
-        <MyVideoConference />
-        <RoomAudioRenderer />
-        <ControlBar />
-      </LiveKitRoom>
+        <LiveKitRoom
+          connect={Boolean(token && room)}
+          room={room}
+          video={true}
+          audio={true}
+          token={token}
+          serverUrl={Env.LiveKitUrl}
+          data-lk-theme="default"
+          style={{ height: '100vh' }}
+          onDisconnected={leaveRoom}
+          onError={leaveRoom}
+        >
+          <VideoConference />
+        </LiveKitRoom>
+      </div>
     </div>
   );
 }
 
 export default Meeting;
-
-function MyVideoConference() {
-  const tracks = useTracks(
-    [
-      { source: Track.Source.Camera, withPlaceholder: true },
-      { source: Track.Source.ScreenShare, withPlaceholder: false },
-    ],
-    { onlySubscribed: false }
-  );
-  return (
-    <GridLayout tracks={tracks} style={{ height: 'calc(100vh - var(--lk-control-bar-height))' }}>
-      <ParticipantTile />
-    </GridLayout>
-  );
-}

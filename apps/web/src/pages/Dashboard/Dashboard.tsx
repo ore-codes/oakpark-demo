@@ -1,21 +1,15 @@
 import { Icon } from '@iconify/react';
 import { motion } from 'motion/react';
-import { FC, useRef, useState } from 'react';
+import { FC, useState } from 'react';
 
 import ActionButton from '@/chunks/dashboard/ActionButton.tsx';
 import CreateMeeting from '@/chunks/dashboard/CreateMeeting/CreateMeeting.tsx';
 import JoinMeeting from '@/chunks/dashboard/JoinMeeting/JoinMeeting.tsx';
 import AppLogo from '@/components/AppLogo/AppLogo.tsx';
 import Button from '@/components/Button/Button.tsx';
-import Modal, { ModalRef } from '@/components/Modal.tsx';
+import Modal from '@/components/Modal.tsx';
 import useDashboard from '@/pages/Dashboard/useDashboard.ts';
-import dayjs from 'dayjs';
-import { Page } from '@/constants/pages';
-import { useNavigate } from 'react-router-dom';
-import { Meeting } from '@/lib/common.types';
-import { AttendanceList } from '../MeetingHistory/MeetingHistory';
-import useRxState from '@/lib/storage/useRxState';
-import { authService } from '@/lib/auth/AuthService';
+import MeetingCard from '@/components/MeetingCard/MeetingCard';
 
 const itemVariants = {
   hidden: { opacity: 0, scale: 0.8 },
@@ -32,14 +26,12 @@ const Dashboard: FC = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
-      {/* Header with user profile */}
       <motion.div
         className="border-b-2 px-4 sm:px-8 py-4 flex items-center justify-between"
         variants={itemVariants}
       >
         <AppLogo className="!text-base" />
 
-        {/* Desktop User Profile */}
         <div className="hidden md:flex items-center gap-4">
           <motion.div
             className="flex items-center gap-3 rounded-xl bg-light px-3 py-2"
@@ -62,8 +54,6 @@ const Dashboard: FC = () => {
             </Button>
           </motion.div>
         </div>
-
-        {/* Mobile Profile Menu */}
         <div className="md:hidden relative">
           <button
             onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
@@ -79,8 +69,6 @@ const Dashboard: FC = () => {
               className="size-4"
             />
           </button>
-
-          {/* Mobile Dropdown Menu */}
           {isProfileMenuOpen && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -117,8 +105,6 @@ const Dashboard: FC = () => {
           )}
         </div>
       </motion.div>
-
-      {/* Main content - now takes full width */}
       <motion.main
         className="flex-1"
         initial={{ opacity: 0 }}
@@ -166,13 +152,13 @@ const Dashboard: FC = () => {
             </div>
           </div>
           {h.ongoingMeetings?.length > 0 && <h1 className="text-2xl font-bold mb-4">Ongoing Meetings</h1>}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {h.ongoingMeetings?.map((meeting, index) => (
               <MeetingCard key={meeting.id} meeting={meeting} index={index} />
             ))}
           </div>
           {h.userMeetings?.length > 0 && <h1 className="text-2xl font-bold mb-4">Meeting History</h1>}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {h.userMeetings?.map((meeting, index) => (
               <MeetingCard key={meeting.id} meeting={meeting} index={index} />
             ))}
@@ -180,7 +166,6 @@ const Dashboard: FC = () => {
         </div>
       </motion.main>
 
-      {/* Click outside to close mobile menu */}
       {isProfileMenuOpen && (
         <div
           className="fixed inset-0 z-40 md:hidden"
@@ -199,71 +184,3 @@ const Dashboard: FC = () => {
 };
 
 export default Dashboard;
-
-const MeetingCard: FC<{ meeting: Meeting, index: number }> = ({ meeting, index }) => {
-  const navigate = useNavigate();
-  const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
-  const attendanceModalRef = useRef<ModalRef>();
-  const user = useRxState(authService.userStorage.data$);
-
-  const viewAttendance = (meeting: Meeting) => {
-    setSelectedMeeting(meeting);
-    attendanceModalRef.current?.present();
-  };
-
-  return (
-    <motion.div key={meeting.id} variants={itemVariants}>
-      <motion.div
-        key={meeting.id}
-        className="overflow-hidden rounded-lg border bg-white shadow-sm hover:shadow-md transition-all duration-300"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.1 }}
-      >
-        <div className="relative h-48 overflow-hidden">
-          <img
-            src={`https://picsum.photos/600/400/?blur&random=${meeting.id}`}
-            alt={`Meeting: ${meeting.title}`}
-            className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-          <div className="absolute bottom-4 left-4 right-4">
-            <h3 className="text-lg font-semibold text-white">{meeting.title}</h3>
-          </div>
-        </div>
-
-        <div className="p-4">
-          <div className="mb-4 space-y-2">
-            <p className="text-sm text-gray-500">
-              Created on {dayjs(meeting.createdAt).format('DD/MM/YYYY HH:mm')}
-            </p>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Icon icon="mdi:account-group" className="size-4" />
-              <span>{meeting.participants.length} participants</span>
-            </div>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            {user?.id === meeting.userId && <Button
-              variant="subtle"
-              onClick={() => viewAttendance(meeting)}
-              className="w-full"
-            >
-              <Icon icon="mdi:account-group" className="mr-2 size-5" />
-              View Attendance
-            </Button>}
-            <Button
-              onClick={() => navigate(Page.Meeting(meeting.code))}
-              className="w-full"
-            >
-              <Icon icon="mdi:video-account" className="mr-2 size-5" />
-              Join again
-            </Button>
-          </div>
-        </div>
-      </motion.div>
-      <Modal ref={attendanceModalRef}>
-        <AttendanceList meeting={selectedMeeting} />
-      </Modal>
-    </motion.div>
-  );
-};
