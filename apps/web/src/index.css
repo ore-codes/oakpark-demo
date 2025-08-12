@@ -9,6 +9,7 @@ body {
 body [data-lk-theme="default"] {
   color-scheme: light;
   --lk-fg: #0C2039;
+  --lk-fg5: #000;
   --lk-fg-secondary: #083E2C;
   --lk-fg-tertiary: #96c624;
 
@@ -48,4 +49,8 @@ body [data-lk-theme="default"] {
 
 .lk-participant-name {
   color: #fff !important;
+}
+
+.lk-chat-entry .lk-participant-name {
+  color: #000 !important;
 }

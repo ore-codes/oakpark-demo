@@ -13,6 +13,11 @@ import { JoinMeetingRes } from './Meeting.types.ts';
 import { Icon } from '@iconify/react';
 import { VideoConference } from '@/chunks/meeting/VideoConference/VideoConference.tsx';
 import { formatMeetingCode } from '@/lib/utils.ts';
+import Modal, { ModalRef } from '@/components/Modal.tsx';
+import SubmissionPortal from '@/chunks/meeting/SubmissionPortal/SubmissionPortal.tsx';
+import { enqueueSnackbar } from 'notistack';
+import Button from '@/components/Button/Button.tsx';
+import { Meeting as TMeeting } from '@/lib/common.types.ts';
 
 function Meeting() {
   const { code } = useParams<{ code: string }>();
@@ -21,9 +26,13 @@ function Meeting() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef2 = useRef<NodeJS.Timeout | null>(null);
   const room = useMemo(() => new Room(), []);
   const joinApiRequest = useApiRequest<JoinMeetingRes>();
   const navigate = useNavigate();
+  const submitApiRequest = useApiRequest<{ success: boolean }>();
+  const submitModalRef = useRef<ModalRef>(null);
+  const getMeetingRequest = useApiRequest<TMeeting>();
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -54,6 +63,16 @@ function Meeting() {
         }, 1000);
       }
     });
+
+    setTimeout(() => {
+      intervalRef2.current = setInterval(() => {
+        getMeetingRequest.makeRequest(apiClient.get(`meetings/${code}`)).subscribe((data) => {
+          if (data) {
+            setMeeting(data);
+          }
+        });
+      }, 10000);
+    }, 10000);
   };
   useEffect(mounted, []);
 
@@ -61,6 +80,9 @@ function Meeting() {
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+      }
+      if (intervalRef2.current) {
+        clearInterval(intervalRef2.current);
       }
     };
   }, []);
@@ -71,6 +93,43 @@ function Meeting() {
     }
     navigate(Page.Dashboard);
     joinApiRequest.makeRequest(apiClient.put('meetings/leave', { code }));
+  };
+
+  const handleSubmit = async (files: File[]) => {
+    if (!files.length || !meeting?.id) return;
+
+    const formData = new FormData();
+    const file = files[0];
+    formData.append('file', file, file.name);
+
+    try {
+      submitApiRequest.makeRequest(
+        apiClient.post(`submissions/${meeting.id}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
+      ).subscribe({
+        next: (res) => {
+          if (res) {
+            enqueueSnackbar('Document(s) attached successfully!', {
+              variant: 'success',
+              autoHideDuration: 5000,
+            });
+            submitModalRef.current?.dismiss();
+          }
+        },
+        error: (error) => {
+          enqueueSnackbar(error.response?.data?.message || 'Failed to submit document', {
+            variant: 'error',
+          });
+        }
+      });
+    } catch (error) {
+      enqueueSnackbar('Failed to submit document', {
+        variant: 'error',
+      });
+    }
   };
 
   if (!meeting) return null;
@@ -179,6 +238,11 @@ function Meeting() {
                     )}
                   </div>
                 </div>
+
+                <Button variant="subtle" className="w-full" onClick={() => submitModalRef.current?.present()}>
+                  <Icon icon="solar:document-check-outline" className="size-5" />
+                  Attach a file
+                </Button>
               </div>
             </div>
           </motion.div>
@@ -206,6 +270,13 @@ function Meeting() {
         >
           <VideoConference />
         </LiveKitRoom>
+        <Modal ref={submitModalRef}>
+          <SubmissionPortal
+            onSubmit={handleSubmit}
+            onCancel={() => submitModalRef.current?.dismiss()}
+            isSubmitting={submitApiRequest.loading}
+          />
+        </Modal>
       </div>
     </div>
   );

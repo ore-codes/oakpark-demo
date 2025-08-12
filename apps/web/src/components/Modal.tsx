@@ -19,7 +19,7 @@ const Modal = forwardRef<ModalRef, PropsWithChildren>((props, ref) => {
 
   return (
     <div
-      className="fixed left-0 top-0 grid h-screen w-screen place-items-center bg-primary/20"
+      className="fixed left-0 top-0 grid h-screen w-screen place-items-center bg-primary/20 z-50"
       onClick={() => setIsVisible(false)}
     >
       <motion.div
