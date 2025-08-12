@@ -1,17 +1,4 @@
 version: '3.8'
 
-services:
-  postgres:
-    image: postgres:15
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: mydb
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
-volumes:
-  pgdata:
+# SQLite database is file-based and doesn't require a separate service
+# The database file will be created automatically in the prisma directory
