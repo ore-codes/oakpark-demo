@@ -64,15 +64,15 @@ function Meeting() {
       }
     });
 
-    setTimeout(() => {
-      intervalRef2.current = setInterval(() => {
-        getMeetingRequest.makeRequest(apiClient.get(`meetings/${code}`)).subscribe((data) => {
-          if (data) {
-            setMeeting(data);
-          }
-        });
-      }, 10000);
-    }, 10000);
+    // setTimeout(() => {
+    //   intervalRef2.current = setInterval(() => {
+    //     getMeetingRequest.makeRequest(apiClient.get(`meetings/${code}`)).subscribe((data) => {
+    //       if (data) {
+    //         setMeeting(data);
+    //       }
+    //     });
+    //   }, 10000);
+    // }, 10000);
   };
   useEffect(mounted, []);
 
@@ -81,9 +81,9 @@ function Meeting() {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
-      if (intervalRef2.current) {
-        clearInterval(intervalRef2.current);
-      }
+      // if (intervalRef2.current) {
+      //   clearInterval(intervalRef2.current);
+      // }
     };
   }, []);
 
