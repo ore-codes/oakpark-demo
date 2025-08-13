@@ -1,6 +1,6 @@
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -9,7 +9,7 @@ generator client {
 }
 
 model User {
-  id           String               @id @default(cuid())
+  id           String               @id @default(uuid())
   username     String
   email        String               @unique
   password     String
@@ -20,7 +20,7 @@ model User {
 }
 
 model Meeting {
-  id             String               @id @default(cuid())
+  id             String               @id @default(uuid())
   title          String
   code           String               @unique
   userId         String
@@ -34,7 +34,7 @@ model Meeting {
 }
 
 model MeetingParticipant {
-  id             String   @id @default(cuid())
+  id             String   @id @default(uuid())
   meetingId      String
   meeting        Meeting  @relation(fields: [meetingId], references: [id], name: "MeetingParticipants")
   userId         String
@@ -47,7 +47,7 @@ model MeetingParticipant {
 }
 
 model Submission {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   meetingId   String
   meeting     Meeting  @relation(fields: [meetingId], references: [id], name: "MeetingSubmissions")
   userId      String
