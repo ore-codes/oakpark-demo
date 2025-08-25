@@ -114,7 +114,7 @@ export default MeetingHistory;
 export const AttendanceList: FC<{ meeting: Meeting }> = ({ meeting }) => {
   const calculateAttendancePercentage = (participantDuration: number, hostDuration: number): number => {
     if (hostDuration === 0) return 0;
-    return Math.round((participantDuration / hostDuration) * 100);
+    return Math.round((Math.min(participantDuration, hostDuration) / hostDuration) * 100);
   };
 
   const getHostParticipant = (meeting: any) => {
